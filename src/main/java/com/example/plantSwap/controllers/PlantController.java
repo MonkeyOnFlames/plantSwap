@@ -26,8 +26,8 @@ public class PlantController {
 
         @GetMapping
         public ResponseEntity<List<Plant>> getAllPlants() {
-            List<Plant> users = plantRepository.findAll();
-            return ResponseEntity.ok(users);
+            List<Plant> plants = plantRepository.findAll();
+            return ResponseEntity.ok(plants);
         }
 
         @GetMapping("/{id}")
