@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/plants")
@@ -18,7 +19,17 @@ public class PlantController {
         private PlantRepository plantRepository;
 
         @PostMapping
-        public ResponseEntity<Plant> createUser(@RequestBody Plant plant) {
+        public ResponseEntity<Plant> createPlant(@RequestBody Plant plant) {
+            List<Plant> userAdds = plantRepository.findByUserId(plant.getUser().getId());
+            int i = 0;
+            for (Plant plantCheck : userAdds) {
+                if (Objects.equals(plantCheck.getStatus(), "available")) {
+                    i++;
+                }
+            }
+            if (i >= 10){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot have more than 10 available plants");
+            }
             Plant savedPlant = plantRepository.save(plant);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(savedPlant);
@@ -38,7 +49,7 @@ public class PlantController {
         }
 
         @PutMapping("/{id}")
-        public ResponseEntity<Plant> updateUser(@PathVariable String id, @RequestBody Plant plantDetails) {
+        public ResponseEntity<Plant> updatePlant(@PathVariable String id, @RequestBody Plant plantDetails) {
             Plant existingPlant = plantRepository.findById(id)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Plant not found"));
 
@@ -60,9 +71,9 @@ public class PlantController {
         }
 
         @DeleteMapping("/{id}")
-        public ResponseEntity<Plant> deleteUser(@PathVariable String id) {
+        public ResponseEntity<Plant> deletePlant(@PathVariable String id) {
             if (!plantRepository.existsById(id)) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Plant not found");
             }
 
             plantRepository.deleteById(id);
@@ -76,4 +87,6 @@ public class PlantController {
             List<Plant> availablePlants = plantRepository.findByStatus(available);
             return ResponseEntity.ok(availablePlants);
         }
+
+
 }

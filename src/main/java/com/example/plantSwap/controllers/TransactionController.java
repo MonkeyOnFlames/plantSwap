@@ -24,20 +24,31 @@ public class TransactionController {
     private PlantRepository plantRepository;
 
     @PostMapping
-    public ResponseEntity<Transaction> createUser(@RequestBody Transaction transaction) {
+    public ResponseEntity<Transaction> createTransaction(@RequestBody Transaction transaction) {
+        // when a plant is sent into transaction, all it details becomes null, 0 or false, making it impossible to check for trade
+        // Want to add if transaction.getTradePlant() is empty, but do not know how
         if (transaction.getPlant().isTrade() && transaction.getTradePlant() == null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This plant must be traded");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This plant must be traded!");
         } else if (!transaction.getPlant().isTrade() && transaction.getTradePlant() != null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This plant cannot be traded");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This plant cannot be traded!");
+        } else if (transaction.getPlant().isTrade() && !transaction.getTradePlant().isTrade()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The plant you try to trade with cannot be traded!");
         }
 
         if (transaction.getPlant().isTrade()){
-            transaction.getPlant().setStatus("Traded");
-            transaction.getTradePlant().setStatus("Traded");
+            transaction.getPlant().setStatus("pending, waiting approval");
+
+            transaction.getTradePlant().setStatus("pending, waiting approval");
+
+            transaction.setPlant(transaction.getPlant());
+            transaction.setTradePlant(transaction.getTradePlant());
+
             plantRepository.save(transaction.getPlant());
             plantRepository.save(transaction.getTradePlant());
         } else {
-            transaction.getPlant().setStatus("Bought");
+            transaction.getPlant().setStatus("bought");
+            transaction.getPlant().setUser(transaction.getUser());
+            transaction.setPlant(transaction.getPlant());
             plantRepository.save(transaction.getPlant());
         }
 
@@ -59,7 +70,7 @@ public class TransactionController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Transaction> updateUser(@PathVariable String id, @RequestBody Transaction transactionDetails) {
+    public ResponseEntity<Transaction> updateTransaction(@PathVariable String id, @RequestBody Transaction transactionDetails) {
         Transaction existingTransaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
 
@@ -68,5 +79,13 @@ public class TransactionController {
         existingTransaction.setTradePlant(transactionDetails.getTradePlant());
 
         return ResponseEntity.ok(transactionRepository.save(existingTransaction));
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Transaction>>  getTransactionByUserId(@PathVariable String userId) {
+
+        List<Transaction> transactions = transactionRepository.findByUserId(userId);
+
+        return new ResponseEntity<>(transactions, HttpStatus.OK);
     }
 }
