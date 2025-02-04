@@ -69,4 +69,11 @@ public class PlantController {
 
             return ResponseEntity.noContent().build();
         }
+
+        @GetMapping("/available")
+        public ResponseEntity<List<Plant>> getAvailablePlants() {
+            String available = "available";
+            List<Plant> availablePlants = plantRepository.findByStatus(available);
+            return ResponseEntity.ok(availablePlants);
+        }
 }

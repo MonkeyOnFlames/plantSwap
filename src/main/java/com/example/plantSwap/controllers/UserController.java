@@ -1,6 +1,8 @@
 package com.example.plantSwap.controllers;
 
+import com.example.plantSwap.models.Plant;
 import com.example.plantSwap.models.User;
+import com.example.plantSwap.repositories.PlantRepository;
 import com.example.plantSwap.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,8 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PlantRepository plantRepository;
 
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user) {
@@ -60,5 +64,13 @@ public class UserController {
         userRepository.deleteById(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/plants")
+    public ResponseEntity<List<Plant>>  getPlantByUserId(@PathVariable String id) {
+
+        List<Plant> plants = plantRepository.findByUserId(id);
+
+        return new ResponseEntity<>(plants, HttpStatus.OK);
     }
 }
