@@ -50,4 +50,15 @@ public class UserController {
 
         return ResponseEntity.ok(userRepository.save(existingUser));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<User> deleteUser(@PathVariable String id) {
+        if(!userRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        }
+
+        userRepository.deleteById(id);
+
+        return ResponseEntity.noContent().build();
+    }
 }
