@@ -2,6 +2,7 @@ package com.example.plantSwap.controllers;
 
 import com.example.plantSwap.models.Plant;
 import com.example.plantSwap.repositories.PlantRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ public class PlantController {
         private PlantRepository plantRepository;
 
         @PostMapping
-        public ResponseEntity<Plant> createPlant(@RequestBody Plant plant) {
+        public ResponseEntity<Plant> createPlant(@Valid @RequestBody Plant plant) {
             List<Plant> userAdds = plantRepository.findByUserId(plant.getUser().getId());
             int i = 0;
             for (Plant plantCheck : userAdds) {
@@ -49,7 +50,7 @@ public class PlantController {
         }
 
         @PutMapping("/{id}")
-        public ResponseEntity<Plant> updatePlant(@PathVariable String id, @RequestBody Plant plantDetails) {
+        public ResponseEntity<Plant> updatePlant(@Valid @PathVariable String id, @RequestBody Plant plantDetails) {
             Plant existingPlant = plantRepository.findById(id)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Plant not found"));
 

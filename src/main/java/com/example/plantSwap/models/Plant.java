@@ -1,7 +1,7 @@
 package com.example.plantSwap.models;
 
 // This import does not want to work
-// import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -22,10 +22,8 @@ public class Plant {
     private String waterNeeds;
     private int difficulty;
     private boolean trade;
-    //this is what I would have done if the import in the comment above had worked to fix min and max value
-    //@Min (value = 50, message = "Price cannot be under 50");
-    //@Max (value = 1000, message = "Price cannot be over 1000");
-    //would also have put them on my setPrice
+    @Min (value = 50, message = "Price cannot be under 50")
+    @Max (value = 1000, message = "Price cannot be over 1000")
     private double price;
     private String pictureUrl;
     private String status;
