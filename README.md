@@ -17,7 +17,7 @@ Users:
         "email": "plantlover@email.com",
     }
 ```
-       
+
 Plants (gjorde flera av dem när det behövdes):
 ```
 {
@@ -85,33 +85,36 @@ https://documenter.getpostman.com/view/40863104/2sAYX5MNuM
 
 Affärsregler:
 
-En användare kan inte ha mer än 10 aktiva annonser samtidigt:
-Detta löste jag genom att när en planta skapas, så görs en lista av den användaren plantor. 
-Sedan med en for loop kollar jag igneom listan för att se alla som är avialable, och gör en int som ökas med ett. 
+- En användare kan inte ha mer än 10 aktiva annonser samtidigt:
+
+Detta löste jag genom att när en planta skapas, så görs en lista av den användaren plantor.
+Sedan med en for loop kollar jag igneom listan för att se alla som är avialable, och gör en int som ökas med ett.
 Sedan ser jag till att den int:en inte är strörre än 10
 
-Växter markerade för byte kan endast bytas mot andra växter, inte säljas:
+- Växter markerade för byte kan endast bytas mot andra växter, inte säljas:
+
 Den här försökte jag lösa med en if-sats. Jag har inte möjlighet att testa detta då min plantors information försvinner när dem läggs in i transaction
 
-Vid byte måste båda parter godkänna bytet innan det genomförs:
+- Vid byte måste båda parter godkänna bytet innan det genomförs:
+
 Detta simullerade jag genom att se till att när en trade genomförs så sätts dem i "pending, awaiting approval". Detta kunde jag inte testa pågrund av samma fel som åvan.
 
-Prissatta växter måste ha ett fast pris mellan 50-1000 kr:
-Detta villa jag lösa med @Min och @Max. Dock fungerade inte importen som behövdes för att dem skulle funka, så dem ligger inne men är bort kommenterade.
+- Prissatta växter måste ha ett fast pris mellan 50-1000 kr:
+
+Detta löste jag genom att annotera price i plant modellen med @Min och @Max. Och lade sedan till @Valid i createPlant och updatePlant
 
 Lista över begränsningar:
-Koden är inte validerad, så man kan skriva lite som man vill
-Vissa saker fungerar inte som jag har beskrivit åvan.
-har inget sätt att gå från pending till traded i en transaction
-Saker som status är en string, vilket gör det svårare att använda dem då det kan stå lite vad som helst
-ingen säkerhet
+- Koden är inte validerad, så man kan skriva lite som man vill
+- Vissa saker fungerar inte som jag har beskrivit åvan.
+- har inget sätt att gå från pending till traded i en transaction
+- Saker som status är en string, vilket gör det svårare att använda dem då det kan stå lite vad som helst
+- ingen säkerhet
 
 Förslag på förbättringar:
-Det som jag skulle göra är att se till att importen fungerar för @Min och @Max
-Fixa så att plants infon inte blir null så fort dem lägga in i transaction.
-Göra status, type och size på Plants till enum, för att kunna bättre bestämma vad dem ska vara.
-Skulle inte använda @Autowired, utan det rätta sättet
-Använt en service class för att snygga till det hela lite
-Validera koden med t.ex NotNull, NotEmpty
-Lägga till så att man kan bekräfta en trade
-Lägga till funktioner som har med säkerhet att göra, för att göra det säkrare
+- Fixa så att plants infon inte blir null så fort dem lägga in i transaction.
+- Göra status och type på Plants till enum, för att kunna bättre bestämma vad dem ska vara.
+- Skulle inte använda @Autowired, utan det rätta sättet
+- Använt en service class för att snygga till det hela lite
+- Validera koden med t.ex NotNull, NotEmpty
+- Lägga till så att man kan bekräfta en trade
+- Lägga till funktioner som har med säkerhet att göra, för att göra det säkrare
