@@ -29,47 +29,42 @@ public class TransactionController {
         // when a plant is sent into transaction, all it details becomes null, 0 or false, making it impossible to check for trade
         // Want to add if transaction.getTradePlant() is empty, but do not know how
 
-        Plant plant = transaction.getPlant();
+        if (transaction.getPlant() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Plant is required");
+        }
 
-        if (plant.isTrade()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This plant must be traded!");
-        } else if (!plant.isTrade() && transaction.getTradePlant() != null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This plant cannot be traded!");
-        } else if (plant.isTrade() && !transaction.getTradePlant().isTrade()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The plant you try to trade with cannot be traded!");
+        Plant existingPlant = plantRepository.findPlantById(transaction.getPlant().getId());
+        boolean originalPlantIsTrade = existingPlant.isTrade();
+
+        Plant existingTradePlant = null;
+
+
+        if (originalPlantIsTrade){
+            if (transaction.getTradePlant() == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "tradePlant is required");
+            }
+            existingTradePlant = plantRepository.findPlantById(transaction.getTradePlant().getId());
         }
 
 
 
-        if (transaction.getPlant().isTrade()){
-            plant.setStatus("pending, waiting approval");
+        if (originalPlantIsTrade){
+            existingPlant.setStatus("pending, waiting approval");
 
-            transaction.getTradePlant().setStatus("pending, waiting approval");
+            existingTradePlant.setStatus("pending, waiting approval");
 
-            transaction.setTradePlant(transaction.getTradePlant());
+            transaction.setTradePlant(existingTradePlant);
 
             plantRepository.save(transaction.getTradePlant());
         } else {
-            plant.setStatus("bought");
-            plant.setUser(transaction.getUser());
-
-
+            existingPlant.setStatus("bought");
+            existingPlant.setUser(transaction.getUser());
         }
-        plant.setName(transaction.getPlant().getName());
-        plant.setScientificName(transaction.getPlant().getScientificName());
-        plant.setAge(transaction.getPlant().getAge());
-        plant.setSize(transaction.getPlant().getSize());
-        plant.setType(transaction.getPlant().getType());
-        plant.setLightNeeds(transaction.getPlant().getLightNeeds());
-        plant.setWaterNeeds(transaction.getPlant().getWaterNeeds());
-        plant.setDifficulty(transaction.getPlant().getDifficulty());
-        plant.setTrade(transaction.getPlant().isTrade());
-        plant.setPrice(transaction.getPlant().getPrice());
-        plant.setPictureUrl(transaction.getPlant().getPictureUrl());
 
-        transaction.setPlant(plant);
 
-        plantRepository.save(plant);
+        transaction.setPlant(existingPlant);
+
+        plantRepository.save(existingPlant);
 
         Transaction savedTransaction = transactionRepository.save(transaction);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedTransaction);
